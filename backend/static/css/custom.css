@@ -1,6 +1,6 @@
 /* backend/static/css/custom.css */
 
-/* Import Google Fonts (alternatif jika tidak di HTML) */
+/* Import Google Fonts (alternatif jika tidak di HTML, tapi disarankan di HTML untuk performa) */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 /* Variabel CSS untuk warna kustom (mirip Bootstrap variabel) */

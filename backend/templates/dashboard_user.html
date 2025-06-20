@@ -32,20 +32,21 @@
                 {% if profile %}
                     {# Hitung persentase kelengkapan profil #}
                     {% set completed_fields = 0 %}
-                    {% set total_fields = 8 %} {# full_name, nim, university, major, gpa, phone_number, address, cv_path, surat_pengantar_path, transkrip_nilai_path #}
+                    {# Asumsi total 10 field: full_name, nim, university, major, gpa, phone_number, address, cv_path, surat_pengantar_path, transkrip_nilai_path #}
+                    {% set total_fields = 10 %} 
 
                     {% if profile.full_name %} {% set completed_fields = completed_fields + 1 %} {% endif %}
                     {% if profile.nim %} {% set completed_fields = completed_fields + 1 %} {% endif %}
                     {% if profile.university %} {% set completed_fields = completed_fields + 1 %} {% endif %}
                     {% if profile.major %} {% set completed_fields = completed_fields + 1 %} {% endif %}
-                    {% if profile.gpa is not none %} {% set completed_fields = completed_fields + 1 %} {% endif %} {# IPK bisa 0.0, jadi pakai is not none #}
+                    {% if profile.gpa is not none %} {% set completed_fields = completed_fields + 1 %} {% endif %}
                     {% if profile.phone_number %} {% set completed_fields = completed_fields + 1 %} {% endif %}
                     {% if profile.address %} {% set completed_fields = completed_fields + 1 %} {% endif %}
                     {% if profile.cv_path %} {% set completed_fields = completed_fields + 1 %} {% endif %}
                     {% if profile.surat_pengantar_path %} {% set completed_fields = completed_fields + 1 %} {% endif %}
                     {% if profile.transkrip_nilai_path %} {% set completed_fields = completed_fields + 1 %} {% endif %}
 
-                    {% set percentage = ((completed_fields / 10) * 100) | round(0) %}
+                    {% set percentage = ((completed_fields / total_fields) * 100) | round(0) %}
                     {% set progress_color = 'bg-success' if percentage == 100 else 'bg-warning' if percentage > 50 else 'bg-danger' %}
 
                     <div class="mb-4">
