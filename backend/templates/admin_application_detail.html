@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}Detail Aplikasi Magang - {{ applicant_user.username }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-9">
+        <div class="card shadow-sm p-4">
+            <div class="card-body">
+                <h2 class="card-title text-center mb-4 fw-bold">Detail Aplikasi Magang</h2>
+
+                <div class="mb-4 pb-3 border-bottom">
+                    <h3 class="fs-5 fw-semibold text-dark mb-3">Informasi Pelamar</h3>
+                    <div class="row g-2">
+                        <div class="col-md-6"><p class="mb-1"><strong>Username:</strong> {{ applicant_user.username }}</p></div>
+                        <div class="col-md-6"><p class="mb-1"><strong>Email:</strong> {{ applicant_user.email }}</p></div>
+                        {% if applicant_profile %}
+                        <div class="col-md-6"><p class="mb-1"><strong>Nama Lengkap:</strong> {{ applicant_profile.full_name or '-' }}</p></div>
+                        <div class="col-md-6"><p class="mb-1"><strong>NIM:</strong> {{ applicant_profile.nim or '-' }}</p></div>
+                        <div class="col-md-6"><p class="mb-1"><strong>Universitas:</strong> {{ applicant_profile.university or '-' }}</p></div>
+                        <div class="col-md-6"><p class="mb-1"><strong>Jurusan:</strong> {{ applicant_profile.major or '-' }}</p></div>
+                        <div class="col-md-6"><p class="mb-1"><strong>IPK:</strong> {{ applicant_profile.gpa or '-' }}</p></div>
+                        <div class="col-md-6"><p class="mb-1"><strong>No. Telepon:</strong> {{ applicant_profile.phone_number or '-' }}</p></div>
+                        <div class="col-12"><p class="mb-1"><strong>Alamat:</strong> {{ applicant_profile.address or '-' }}</p></div>
+
+                        <h4 class="fs-6 fw-semibold text-dark mt-4 mb-2 col-12">Dokumen Terunggah:</h4>
+                        <ul class="list-group list-group-flush mb-0 col-12">
+                            <li class="list-group-item d-flex justify-content-between align-items-center px-0 py-2">
+                                CV/Resume:
+                                {% if applicant_profile.cv_path %}
+                                    <a href="{{ url_for('static', filename='uploads/' + applicant_profile.cv_path) }}" target="_blank" class="btn btn-sm btn-info text-white">Lihat Dokumen</a>
+                                {% else %}
+                                    <span class="badge bg-danger">Tidak ada</span>
+                                {% endif %}
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center px-0 py-2">
+                                Surat Pengantar:
+                                {% if applicant_profile.surat_pengantar_path %}
+                                    <a href="{{ url_for('static', filename='uploads/' + applicant_profile.surat_pengantar_path) }}" target="_blank" class="btn btn-sm btn-info text-white">Lihat Dokumen</a>
+                                {% else %}
+                                    <span class="badge bg-danger">Tidak ada</span>
+                                {% endif %}
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center px-0 py-2">
+                                Transkrip Nilai:
+                                {% if applicant_profile.transkrip_nilai_path %}
+                                    <a href="{{ url_for('static', filename='uploads/' + applicant_profile.transkrip_nilai_path) }}" target="_blank" class="btn btn-sm btn-info text-white">Lihat Dokumen</a>
+                                {% else %}
+                                    <span class="badge bg-danger">Tidak ada</span>
+                                {% endif %}
+                            </li>
+                        </ul>
+                        {% else %}
+                        <p class="col-12 text-muted">Profil mahasiswa belum lengkap.</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="mb-4 pb-3 border-bottom">
+                    <h3 class="fs-5 fw-semibold text-dark mb-3">Detail Aplikasi</h3>
+                    <p class="mb-1"><strong>Tanggal Melamar:</strong> {{ application.applied_date.strftime('%d-%m-%Y %H:%M') }}</p>
+                    <p class="mb-1"><strong>Divisi Pilihan:</strong> {{ application.preferred_division or '-' }}</p>
+                    <p class="mb-1"><strong>Periode Magang:</strong>
+                        {% if application.start_date and application.end_date %}
+                            {{ application.start_date.strftime('%d-%m-%Y') }} s/d {{ application.end_date.strftime('%d-%m-%Y') }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </p>
+                    <p class="mb-0"><strong>Status Saat Ini:</strong>
+                        <span class="badge 
+                            {% if application.status == 'Accepted' %}bg-success
+                            {% elif application.status == 'Rejected' %}bg-danger
+                            {% elif application.status == 'Pending' %}bg-warning text-dark
+                            {% elif application.status == 'Reviewed' %}bg-info
+                            {% elif application.status == 'Interview' %}bg-primary
+                            {% else %}bg-secondary{% endif %}">
+                            {{ application.status }}
+                        </span>
+                    </p>
+                </div>
+
+                <h3 class="fs-5 fw-semibold text-dark mb-3">Perbarui Status Aplikasi</h3>
+                <form action="{{ url_for('application_detail', app_id=application.id) }}" method="POST">
+                    <div class="mb-3">
+                        <label for="status" class="form-label">Ubah Status:</label>
+                        <select id="status" name="status" class="form-select">
+                            <option value="Pending" {% if application.status == 'Pending' %}selected{% endif %}>Pending</option>
+                            <option value="Reviewed" {% if application.status == 'Reviewed' %}selected{% endif %}>Sudah Ditinjau</option>
+                            <option value="Interview" {% if application.status == 'Interview' %}selected{% endif %}>Wawancara</option>
+                            <option value="Accepted" {% if application.status == 'Accepted' %}selected{% endif %}>Diterima</option>
+                            <option value="Rejected" {% if application.status == 'Rejected' %}selected{% endif %}>Ditolak</option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label for="admin_notes" class="form-label">Catatan Admin (Opsional):</label>
+                        <textarea id="admin_notes" name="admin_notes" rows="4" class="form-control">{{ application.admin_notes or '' }}</textarea>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <button type="submit" class="btn btn-primary btn-lg">Simpan Perubahan</button>
+                        <a href="{{ url_for('admin_dashboard') }}" class="btn btn-link text-muted">Kembali ke Dashboard</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

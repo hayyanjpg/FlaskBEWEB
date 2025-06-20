@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard Mahasiswa{% endblock %}
+
+{% block content %}
+<h1 class="mb-4 fw-bold text-dark">Dashboard Mahasiswa</h1>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-6">
+        <div class="card shadow-sm p-4 h-100">
+            <div class="card-body d-flex flex-column">
+                <h2 class="card-title fs-4 fw-semibold text-dark mb-4 d-flex justify-content-between align-items-center">
+                    Profil Anda
+                    <a href="{{ url_for('edit_profile') }}" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-pencil me-1"></i> Edit Profil
+                    </a>
+                </h2>
+                {% if profile %}
+                    <p class="card-text"><strong>Nama Lengkap:</strong> {{ profile.full_name or 'Belum diisi' }}</p>
+                    <p class="card-text"><strong>NIM:</strong> {{ profile.nim or 'Belum diisi' }}</p>
+                    <p class="card-text"><strong>Universitas:</strong> {{ profile.university or 'Belum diisi' }}</p>
+                    <p class="card-text"><strong>Jurusan:</strong> {{ profile.major or 'Belum diisi' }}</p>
+                    <p class="card-text"><strong>IPK:</strong> {{ profile.gpa or 'Belum diisi' }}</p>
+                    <p class="card-text"><strong>No. Telepon:</strong> {{ profile.phone_number or 'Belum diisi' }}</p>
+                    <p class="card-text"><strong>Alamat:</strong> {{ profile.address or 'Belum diisi' }}</p>
+                    
+                    <h3 class="fs-5 fw-semibold text-dark mt-4 mb-3">Dokumen:</h3>
+                    <ul class="list-group list-group-flush mb-0">
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0 py-2">
+                            CV/Resume:
+                            {% if profile.cv_path %}
+                                <a href="{{ url_for('static', filename='uploads/' + profile.cv_path) }}" target="_blank" class="btn btn-sm btn-info text-white">Lihat Dokumen</a>
+                            {% else %}
+                                <span class="badge bg-warning text-dark">Belum diunggah</span>
+                            {% endif %}
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0 py-2">
+                            Surat Pengantar:
+                            {% if profile.surat_pengantar_path %}
+                                <a href="{{ url_for('static', filename='uploads/' + profile.surat_pengantar_path) }}" target="_blank" class="btn btn-sm btn-info text-white">Lihat Dokumen</a>
+                            {% else %}
+                                <span class="badge bg-warning text-dark">Belum diunggah</span>
+                            {% endif %}
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0 py-2">
+                            Transkrip Nilai:
+                            {% if profile.transkrip_nilai_path %}
+                                <a href="{{ url_for('static', filename='uploads/' + profile.transkrip_nilai_path) }}" target="_blank" class="btn btn-sm btn-info text-white">Lihat Dokumen</a>
+                            {% else %}
+                                <span class="badge bg-warning text-dark">Belum diunggah</span>
+                            {% endif %}
+                        </li>
+                    </ul>
+                {% else %}
+                    <p class="card-text text-muted">Profil Anda belum lengkap. Silakan <a href="{{ url_for('edit_profile') }}" class="text-decoration-none">lengkapi profil Anda</a>.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card shadow-sm p-4 h-100 d-flex flex-column justify-content-center align-items-center text-center">
+            <div class="card-body">
+                <h2 class="card-title fs-4 fw-semibold text-dark mb-4">Melamar Magang</h2>
+                <p class="card-text text-muted mb-4">Siap untuk memulai pengalaman magang Anda di Kominfo?</p>
+                <a href="{{ url_for('apply_magang') }}" class="btn btn-success btn-lg">Ajukan Lamaran Magang</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm p-4 mt-4">
+    <div class="card-body">
+        <h2 class="card-title fs-4 fw-semibold text-dark mb-4">Riwayat Aplikasi Magang</h2>
+        {% if applications %}
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th scope="col">Tanggal Melamar</th>
+                            <th scope="col">Divisi Pilihan</th>
+                            <th scope="col">Periode</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Catatan Admin</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for app in applications %}
+                        <tr>
+                            <td>{{ app.applied_date.strftime('%d-%m-%Y') }}</td>
+                            <td>{{ app.preferred_division or '-' }}</td>
+                            <td>
+                                {% if app.start_date and app.end_date %}
+                                    {{ app.start_date.strftime('%d-%m-%Y') }} s/d {{ app.end_date.strftime('%d-%m-%Y') }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="badge 
+                                    {% if app.status == 'Accepted' %}bg-success
+                                    {% elif app.status == 'Rejected' %}bg-danger
+                                    {% elif app.status == 'Pending' %}bg-warning text-dark
+                                    {% elif app.status == 'Reviewed' %}bg-info
+                                    {% else %}bg-secondary{% endif %}">
+                                    {{ app.status }}
+                                </span>
+                            </td>
+                            <td>{{ app.admin_notes or '-' }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="text-muted">Anda belum mengajukan lamaran magang.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

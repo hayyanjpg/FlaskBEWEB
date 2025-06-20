@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}Beranda - Pendaftaran Magang Kominfo{% endblock %}
+
+{% block content %}
+<div class="p-5 mb-4 bg-white rounded-3 shadow-sm text-center">
+    <div class="container-fluid py-5">
+        <h1 class="display-5 fw-bold text-dark">Selamat Datang di Portal Magang Kominfo</h1>
+        <p class="col-md-8 fs-4 mx-auto text-muted">Daftar sekarang dan mulailah perjalanan karir Anda bersama kami!</p>
+        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+            {% if 'user_id' not in session %}
+            <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg px-4 me-md-2">Daftar Sekarang</a>
+            <a href="{{ url_for('login') }}" class="btn btn-outline-secondary btn-lg px-4">Sudah Punya Akun? Login</a>
+            {% else %}
+                {% if session['role'] == 'admin' %}
+                    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-primary btn-lg px-4 me-md-2">Menuju Dashboard Admin</a>
+                {% else %}
+                    <a href="{{ url_for('user_dashboard') }}" class="btn btn-primary btn-lg px-4 me-md-2">Menuju Dashboard Saya</a>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-6">
+        <div class="h-100 p-5 bg-white border rounded-3 shadow-sm">
+            <h2 class="fw-bold text-dark mb-3">Tentang Program Magang Kominfo</h2>
+            <p class="text-muted">Program magang di Kementerian Komunikasi dan Informatika dirancang untuk memberikan pengalaman praktis bagi mahasiswa dalam lingkungan kerja yang dinamis. Kami menawarkan kesempatan untuk belajar dari para ahli di berbagai bidang, mulai dari teknologi informasi, komunikasi publik, hingga kebijakan digital.</p>
+            <p class="text-muted">Bergabunglah dengan kami untuk mengembangkan keterampilan Anda dan berkontribusi pada pembangunan digital Indonesia.</p>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="h-100 p-5 bg-white border rounded-3 shadow-sm">
+            <h2 class="fw-bold text-dark mb-3">Persyaratan Umum</h2>
+            <ul class="list-unstyled text-muted">
+                <li><i class="bi bi-check-circle-fill text-success me-2"></i>Mahasiswa aktif dari perguruan tinggi di Indonesia.</li>
+                <li><i class="bi bi-check-circle-fill text-success me-2"></i>Memiliki IPK minimal 3.00 (skala 4.00).</li>
+                <li><i class="bi bi-check-circle-fill text-success me-2"></i>Memiliki surat pengantar resmi dari perguruan tinggi.</li>
+                <li><i class="bi bi-check-circle-fill text-success me-2"></i>Bersedia mengikuti program magang sesuai durasi yang ditetapkan.</li>
+                <li><i class="bi bi-check-circle-fill text-success me-2"></i>Memiliki minat di bidang yang relevan dengan tugas dan fungsi Kominfo.</li>
+            </ul>
+            <p class="text-muted mt-3">Lihat <a href="#" class="text-decoration-none">panduan lengkap</a> untuk detail lebih lanjut.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

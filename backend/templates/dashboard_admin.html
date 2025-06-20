@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard Admin{% endblock %}
+
+{% block content %}
+<h1 class="mb-4 fw-bold text-dark">Dashboard Admin</h1>
+
+<div class="card shadow-sm p-4 mb-4">
+    <div class="card-body">
+        <h2 class="card-title fs-4 fw-semibold text-dark mb-4">Ringkasan Aplikasi Magang</h2>
+        {% if applications_data %}
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th scope="col">Nama Mahasiswa</th>
+                            <th scope="col">Universitas</th>
+                            <th scope="col">Divisi Pilihan</th>
+                            <th scope="col">Tanggal Aplikasi</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for data in applications_data %}
+                        <tr>
+                            <td>{{ data.profile.full_name or data.user.username }}</td>
+                            <td>{{ data.profile.university or '-' }}</td>
+                            <td>{{ data.application.preferred_division or '-' }}</td>
+                            <td>{{ data.application.applied_date.strftime('%d-%m-%Y') }}</td>
+                            <td>
+                                <span class="badge 
+                                    {% if data.application.status == 'Accepted' %}bg-success
+                                    {% elif data.application.status == 'Rejected' %}bg-danger
+                                    {% elif data.application.status == 'Pending' %}bg-warning text-dark
+                                    {% elif data.application.status == 'Reviewed' %}bg-info
+                                    {% elif data.application.status == 'Interview' %}bg-primary
+                                    {% else %}bg-secondary{% endif %}">
+                                    {{ data.application.status }}
+                                </span>
+                            </td>
+                            <td>
+                                <a href="{{ url_for('application_detail', app_id=data.application.id) }}" class="btn btn-sm btn-info text-white">Detail</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="text-muted">Belum ada aplikasi magang yang masuk.</p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="card shadow-sm p-4">
+    <div class="card-body">
+        <h2 class="card-title fs-4 fw-semibold text-dark mb-4">Manajemen Pengguna (Mahasiswa)</h2>
+        {% if all_users %}
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th scope="col">Username</th>
+                            <th scope="col">Email</th>
+                            <th scope="col">Role</th>
+                            <th scope="col">Status Akun</th>
+                            <th scope="col">Nama Lengkap (Profil)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user_item in all_users %}
+                        {% if user_item.role == 'mahasiswa' %}
+                        <tr>
+                            <td>{{ user_item.username }}</td>
+                            <td>{{ user_item.email }}</td>
+                            <td>{{ user_item.role }}</td>
+                            <td>
+                                <span class="badge 
+                                    {% if user_item.is_active %}bg-success{% else %}bg-danger{% endif %}">
+                                    {{ 'Aktif' if user_item.is_active else 'Tidak Aktif' }}
+                                </span>
+                            </td>
+                            <td>{{ user_item.mahasiswa_profile.full_name if user_item.mahasiswa_profile else '-' }}</td>
+                        </tr>
+                        {% endif %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="text-muted">Belum ada pengguna terdaftar.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
