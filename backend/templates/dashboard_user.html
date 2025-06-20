@@ -3,83 +3,150 @@
 {% block title %}Dashboard Mahasiswa{% endblock %}
 
 {% block content %}
-<h1 class="mb-4 fw-bold text-dark">Dashboard Mahasiswa</h1>
+<div class="row mb-4 align-items-center">
+    <div class="col-md-8">
+        <h1 class="mb-0 fw-bold text-dark">
+            <i class="bi bi-person-circle text-primary me-2"></i> Selamat Datang, {{ user.username | title }}!
+        </h1>
+        <p class="text-muted lead mt-2">Kelola profil dan pantau status lamaran magang Anda di sini.</p>
+    </div>
+    <div class="col-md-4 text-md-end">
+        <a href="{{ url_for('apply_magang') }}" class="btn btn-success btn-lg shadow-sm">
+            <i class="bi bi-plus-circle me-2"></i> Ajukan Lamaran Baru
+        </a>
+    </div>
+</div>
 
-<div class="row g-4 mb-4">
-    <div class="col-md-6">
-        <div class="card shadow-sm p-4 h-100">
-            <div class="card-body d-flex flex-column">
-                <h2 class="card-title fs-4 fw-semibold text-dark mb-4 d-flex justify-content-between align-items-center">
-                    Profil Anda
-                    <a href="{{ url_for('edit_profile') }}" class="btn btn-sm btn-outline-primary">
+<div class="row g-4 mb-5">
+    <div class="col-lg-7">
+        <div class="card shadow-lg border-0 h-100 rounded-4">
+            <div class="card-body p-4">
+                <h2 class="card-title fs-4 fw-bold text-dark mb-3 d-flex justify-content-between align-items-center">
+                    <i class="bi bi-person-vcard-fill text-info me-2"></i> Profil Anda
+                    <a href="{{ url_for('edit_profile') }}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
                         <i class="bi bi-pencil me-1"></i> Edit Profil
                     </a>
                 </h2>
+                <p class="text-muted mb-3">Lengkapi profil Anda agar aplikasi magang semakin meyakinkan.</p>
+
                 {% if profile %}
-                    <p class="card-text"><strong>Nama Lengkap:</strong> {{ profile.full_name or 'Belum diisi' }}</p>
-                    <p class="card-text"><strong>NIM:</strong> {{ profile.nim or 'Belum diisi' }}</p>
-                    <p class="card-text"><strong>Universitas:</strong> {{ profile.university or 'Belum diisi' }}</p>
-                    <p class="card-text"><strong>Jurusan:</strong> {{ profile.major or 'Belum diisi' }}</p>
-                    <p class="card-text"><strong>IPK:</strong> {{ profile.gpa or 'Belum diisi' }}</p>
-                    <p class="card-text"><strong>No. Telepon:</strong> {{ profile.phone_number or 'Belum diisi' }}</p>
-                    <p class="card-text"><strong>Alamat:</strong> {{ profile.address or 'Belum diisi' }}</p>
-                    
-                    <h3 class="fs-5 fw-semibold text-dark mt-4 mb-3">Dokumen:</h3>
-                    <ul class="list-group list-group-flush mb-0">
-                        <li class="list-group-item d-flex justify-content-between align-items-center px-0 py-2">
-                            CV/Resume:
+                    {# Hitung persentase kelengkapan profil #}
+                    {% set completed_fields = 0 %}
+                    {% set total_fields = 8 %} {# full_name, nim, university, major, gpa, phone_number, address, cv_path, surat_pengantar_path, transkrip_nilai_path #}
+
+                    {% if profile.full_name %} {% set completed_fields = completed_fields + 1 %} {% endif %}
+                    {% if profile.nim %} {% set completed_fields = completed_fields + 1 %} {% endif %}
+                    {% if profile.university %} {% set completed_fields = completed_fields + 1 %} {% endif %}
+                    {% if profile.major %} {% set completed_fields = completed_fields + 1 %} {% endif %}
+                    {% if profile.gpa is not none %} {% set completed_fields = completed_fields + 1 %} {% endif %} {# IPK bisa 0.0, jadi pakai is not none #}
+                    {% if profile.phone_number %} {% set completed_fields = completed_fields + 1 %} {% endif %}
+                    {% if profile.address %} {% set completed_fields = completed_fields + 1 %} {% endif %}
+                    {% if profile.cv_path %} {% set completed_fields = completed_fields + 1 %} {% endif %}
+                    {% if profile.surat_pengantar_path %} {% set completed_fields = completed_fields + 1 %} {% endif %}
+                    {% if profile.transkrip_nilai_path %} {% set completed_fields = completed_fields + 1 %} {% endif %}
+
+                    {% set percentage = ((completed_fields / 10) * 100) | round(0) %}
+                    {% set progress_color = 'bg-success' if percentage == 100 else 'bg-warning' if percentage > 50 else 'bg-danger' %}
+
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between mb-1">
+                            <small class="text-muted">Kelengkapan Profil:</small>
+                            <small class="text-muted">{{ percentage }}%</small>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar {{ progress_color }}" role="progressbar" style="width: {{ percentage }}%;" aria-valuenow="{{ percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
+
+                    <div class="row g-2 text-muted mb-4">
+                        <div class="col-md-6"><strong>Nama:</strong> {{ profile.full_name or '-' }}</div>
+                        <div class="col-md-6"><strong>NIM:</strong> {{ profile.nim or '-' }}</div>
+                        <div class="col-md-6"><strong>Universitas:</strong> {{ profile.university or '-' }}</div>
+                        <div class="col-md-6"><strong>Jurusan:</strong> {{ profile.major or '-' }}</div>
+                        <div class="col-md-6"><strong>IPK:</strong> {{ profile.gpa or '-' }}</div>
+                        <div class="col-md-6"><strong>Telepon:</strong> {{ profile.phone_number or '-' }}</div>
+                        <div class="col-12"><strong>Alamat:</strong> {{ profile.address or '-' }}</div>
+                    </div>
+
+                    <h3 class="fs-5 fw-semibold text-dark mb-3">Dokumen Terunggah:</h3>
+                    <ul class="list-group list-group-flush border-top border-bottom">
+                        <li class="list-group-item d-flex justify-content-between align-items-center py-2 px-0">
+                            CV/Resume
                             {% if profile.cv_path %}
-                                <a href="{{ url_for('static', filename='uploads/' + profile.cv_path) }}" target="_blank" class="btn btn-sm btn-info text-white">Lihat Dokumen</a>
+                                <a href="{{ url_for('static', filename='uploads/' + profile.cv_path) }}" target="_blank" class="btn btn-sm btn-outline-info rounded-pill">Lihat <i class="bi bi-box-arrow-up-right"></i></a>
                             {% else %}
-                                <span class="badge bg-warning text-dark">Belum diunggah</span>
+                                <span class="badge bg-danger">Belum diunggah</span>
                             {% endif %}
                         </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center px-0 py-2">
-                            Surat Pengantar:
+                        <li class="list-group-item d-flex justify-content-between align-items-center py-2 px-0">
+                            Surat Pengantar Kampus
                             {% if profile.surat_pengantar_path %}
-                                <a href="{{ url_for('static', filename='uploads/' + profile.surat_pengantar_path) }}" target="_blank" class="btn btn-sm btn-info text-white">Lihat Dokumen</a>
+                                <a href="{{ url_for('static', filename='uploads/' + profile.surat_pengantar_path) }}" target="_blank" class="btn btn-sm btn-outline-info rounded-pill">Lihat <i class="bi bi-box-arrow-up-right"></i></a>
                             {% else %}
-                                <span class="badge bg-warning text-dark">Belum diunggah</span>
+                                <span class="badge bg-danger">Belum diunggah</span>
                             {% endif %}
                         </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center px-0 py-2">
-                            Transkrip Nilai:
+                        <li class="list-group-item d-flex justify-content-between align-items-center py-2 px-0">
+                            Transkrip Nilai
                             {% if profile.transkrip_nilai_path %}
-                                <a href="{{ url_for('static', filename='uploads/' + profile.transkrip_nilai_path) }}" target="_blank" class="btn btn-sm btn-info text-white">Lihat Dokumen</a>
+                                <a href="{{ url_for('static', filename='uploads/' + profile.transkrip_nilai_path) }}" target="_blank" class="btn btn-sm btn-outline-info rounded-pill">Lihat <i class="bi bi-box-arrow-up-right"></i></a>
                             {% else %}
-                                <span class="badge bg-warning text-dark">Belum diunggah</span>
+                                <span class="badge bg-danger">Belum diunggah</span>
                             {% endif %}
                         </li>
                     </ul>
                 {% else %}
-                    <p class="card-text text-muted">Profil Anda belum lengkap. Silakan <a href="{{ url_for('edit_profile') }}" class="text-decoration-none">lengkapi profil Anda</a>.</p>
+                    <div class="alert alert-info text-center py-4 my-4" role="alert">
+                        <i class="bi bi-info-circle-fill me-2"></i> Profil Anda belum lengkap. Silakan <a href="{{ url_for('edit_profile') }}" class="alert-link text-decoration-none">lengkapi profil Anda</a> untuk melanjutkan.
+                    </div>
                 {% endif %}
             </div>
         </div>
     </div>
 
-    <div class="col-md-6">
-        <div class="card shadow-sm p-4 h-100 d-flex flex-column justify-content-center align-items-center text-center">
-            <div class="card-body">
-                <h2 class="card-title fs-4 fw-semibold text-dark mb-4">Melamar Magang</h2>
-                <p class="card-text text-muted mb-4">Siap untuk memulai pengalaman magang Anda di Kominfo?</p>
-                <a href="{{ url_for('apply_magang') }}" class="btn btn-success btn-lg">Ajukan Lamaran Magang</a>
+    <div class="col-lg-5">
+        <div class="card shadow-lg border-0 h-100 rounded-4 bg-primary text-white">
+            <div class="card-body p-4 d-flex flex-column justify-content-center text-center">
+                <i class="bi bi-briefcase-fill display-2 mb-3 text-white"></i>
+                <h2 class="card-title fs-3 fw-bold mb-3">Status Aplikasi Anda</h2>
+                {% if applications %}
+                    <p class="card-text fs-5 mb-2">Anda memiliki **{{ applications | length }}** aplikasi magang.</p>
+                    {% set latest_app = applications[0] %}
+                    <p class="card-text fs-6 mb-4">Aplikasi terbaru Anda (Divisi: **{{ latest_app.preferred_division or '-' }}**) berstatus:
+                        <span class="badge fs-6 py-2 px-3 rounded-pill 
+                            {% if latest_app.status == 'Accepted' %}bg-success
+                            {% elif latest_app.status == 'Rejected' %}bg-danger
+                            {% elif latest_app.status == 'Pending' %}bg-warning text-dark
+                            {% elif latest_app.status == 'Reviewed' %}bg-info
+                            {% elif latest_app.status == 'Interview' %}bg-secondary
+                            {% else %}bg-light text-dark{% endif %}">
+                            {{ latest_app.status }}
+                        </span>
+                    </p>
+                    <a href="#riwayat-aplikasi" class="btn btn-light btn-lg rounded-pill shadow">Lihat Semua Riwayat <i class="bi bi-arrow-right"></i></a>
+                {% else %}
+                    <p class="card-text fs-5 mb-4">Anda belum memiliki aplikasi magang. Ayo mulai perjalanan Anda!</p>
+                    <a href="{{ url_for('apply_magang') }}" class="btn btn-light btn-lg rounded-pill shadow">Ajukan Lamaran Pertama <i class="bi bi-arrow-right"></i></a>
+                {% endif %}
             </div>
         </div>
     </div>
 </div>
 
-<div class="card shadow-sm p-4 mt-4">
+<div class="card shadow-lg border-0 p-4 rounded-4" id="riwayat-aplikasi">
     <div class="card-body">
-        <h2 class="card-title fs-4 fw-semibold text-dark mb-4">Riwayat Aplikasi Magang</h2>
+        <h2 class="card-title fs-4 fw-bold text-dark mb-4">
+            <i class="bi bi-clock-history text-secondary me-2"></i> Riwayat Aplikasi Magang
+        </h2>
         {% if applications %}
             <div class="table-responsive">
-                <table class="table table-bordered table-hover">
-                    <thead class="table-light">
+                <table class="table table-striped table-hover align-middle">
+                    <thead class="table-dark">
                         <tr>
+                            <th scope="col">#</th>
                             <th scope="col">Tanggal Melamar</th>
                             <th scope="col">Divisi Pilihan</th>
-                            <th scope="col">Periode</th>
+                            <th scope="col">Periode Magang</th>
                             <th scope="col">Status</th>
                             <th scope="col">Catatan Admin</th>
                         </tr>
@@ -87,11 +154,12 @@
                     <tbody>
                         {% for app in applications %}
                         <tr>
-                            <td>{{ app.applied_date.strftime('%d-%m-%Y') }}</td>
-                            <td>{{ app.preferred_division or '-' }}</td>
+                            <th scope="row">{{ loop.index }}</th>
+                            <td>{{ app.applied_date.strftime('%d %b %Y') }}</td>
+                            <td>{{ app.preferred_division or 'N/A' }}</td>
                             <td>
                                 {% if app.start_date and app.end_date %}
-                                    {{ app.start_date.strftime('%d-%m-%Y') }} s/d {{ app.end_date.strftime('%d-%m-%Y') }}
+                                    {{ app.start_date.strftime('%d %b %Y') }} - {{ app.end_date.strftime('%d %b %Y') }}
                                 {% else %}
                                     -
                                 {% endif %}
@@ -102,6 +170,7 @@
                                     {% elif app.status == 'Rejected' %}bg-danger
                                     {% elif app.status == 'Pending' %}bg-warning text-dark
                                     {% elif app.status == 'Reviewed' %}bg-info
+                                    {% elif app.status == 'Interview' %}bg-primary
                                     {% else %}bg-secondary{% endif %}">
                                     {{ app.status }}
                                 </span>
@@ -113,7 +182,9 @@
                 </table>
             </div>
         {% else %}
-            <p class="text-muted">Anda belum mengajukan lamaran magang.</p>
+            <div class="alert alert-secondary text-center py-4" role="alert">
+                <i class="bi bi-exclamation-circle me-2"></i> Anda belum mengajukan lamaran magang.
+            </div>
         {% endif %}
     </div>
 </div>
