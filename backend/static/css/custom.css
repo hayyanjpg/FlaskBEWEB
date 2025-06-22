@@ -14,79 +14,127 @@
     --bs-info: #3498db;    /* Bisa sama dengan primary jika ingin konsisten */
     --bs-dark: #34495e;    /* Darker shade for text */
     --bs-light: #ecf0f1;   /* Lighter shade for backgrounds */
+    --bs-light-hover: #e0e4e7; /* Sedikit lebih gelap untuk hover background light */
 }
 
 
 body {
     font-family: 'Inter', sans-serif; /* Terapkan font modern */
     background-color: var(--bs-light); /* Gunakan warna light yang lebih modern */
+    color: var(--bs-dark); /* Warna teks default */
 }
 
 /* Kustomisasi Navbar */
 .navbar {
     background-color: var(--bs-primary) !important; /* Gunakan warna primary baru */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Bayangan yang lebih halus */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Bayangan yang lebih halus dan dalam */
 }
 .navbar-brand {
     font-weight: 700 !important; /* Bold */
     font-size: 1.8rem !important; /* Ukuran yang sedikit lebih besar */
+    transition: transform 0.2s ease; /* Transisi untuk efek hover */
+}
+.navbar-brand:hover {
+    transform: scale(1.02); /* Sedikit membesar saat hover */
 }
 .nav-link {
     color: rgba(255, 255, 255, 0.8) !important;
-    transition: color 0.3s ease;
+    position: relative; /* Diperlukan untuk efek underline */
+    transition: color 0.3s ease, transform 0.2s ease; /* Transisi untuk warna dan transform */
 }
 .nav-link:hover {
     color: white !important;
+    transform: translateY(-2px); /* Sedikit naik saat hover */
 }
+/* Efek underline saat hover (opsional) */
+.nav-link::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: white;
+    transition: width 0.3s ease;
+}
+.nav-link:hover::after {
+    width: 100%;
+}
+
+/* Tombol di Navbar (Logout, Register) */
 .btn-danger, .btn-success {
-    border-radius: 0.5rem; /* Sudut lebih membulat */
-    font-weight: 500;
-    transition: transform 0.2s ease;
+    border-radius: 0.75rem; /* Sudut lebih membulat */
+    font-weight: 600;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease; /* Transisi untuk banyak properti */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Bayangan awal */
 }
 .btn-danger:hover, .btn-success:hover {
-    transform: translateY(-2px); /* Efek hover naik sedikit */
+    transform: translateY(-3px); /* Naik sedikit saat hover */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* Bayangan membesar saat hover */
+    cursor: pointer; /* Menunjukkan bisa diklik */
 }
 
 /* Kustomisasi Kartu (Card) */
 .card {
     border: none; /* Hapus border default */
-    border-radius: 1rem; /* Sudut lebih membulat */
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); /* Bayangan yang lebih menonjol */
+    border-radius: 1.25rem; /* Sudut lebih membulat */
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); /* Bayangan yang lebih menonjol */
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Transisi untuk efek hover */
+}
+.card:hover {
+    transform: translateY(-5px); /* Sedikit terangkat saat hover */
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15); /* Bayangan lebih besar saat hover */
 }
 .card-title {
     color: var(--bs-dark); /* Warna judul kartu */
 }
 
-/* Kustomisasi Tombol (Button) */
+/* Kustomisasi Tombol Umum */
+.btn {
+    border-radius: 0.75rem; /* Sudut membulat untuk semua tombol */
+    font-weight: 600;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+}
+.btn:hover {
+    transform: translateY(-2px); /* Efek naik ringan */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
 .btn-primary {
     background-color: var(--bs-primary);
     border-color: var(--bs-primary);
-    border-radius: 0.5rem;
-    font-weight: 600;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 .btn-primary:hover {
     background-color: #2980b9; /* Sedikit lebih gelap saat hover */
     border-color: #2980b9;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+.btn-success {
+    background-color: var(--bs-success);
+    border-color: var(--bs-success);
+}
+.btn-success:hover {
+    background-color: #27ae60;
+    border-color: #27ae60;
 }
 .btn-outline-secondary {
-    border-radius: 0.5rem;
-    font-weight: 600;
-    transition: transform 0.2s ease;
+    color: var(--bs-dark);
+    border-color: var(--bs-secondary);
 }
 .btn-outline-secondary:hover {
-    transform: translateY(-2px);
+    background-color: var(--bs-secondary);
+    color: white;
 }
 
 /* Kustomisasi Form Control */
 .form-control, .form-select {
-    border-radius: 0.5rem; /* Sudut membulat */
+    border-radius: 0.75rem; /* Sudut membulat */
     border: 1px solid #ced4da;
     padding: 0.75rem 1rem;
     box-shadow: none !important; /* Hapus shadow default focus Bootstrap */
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Transisi untuk fokus */
 }
 .form-control:focus, .form-select:focus {
     border-color: var(--bs-primary);
@@ -96,7 +144,7 @@ body {
 /* Kustomisasi Badge Status */
 .badge {
     font-weight: 600;
-    padding: 0.5em 0.8em;
+    padding: 0.5em 0.9em;
     border-radius: 0.5rem;
 }
 .badge.bg-warning {
@@ -107,12 +155,23 @@ body {
 .p-5.mb-4.bg-white.rounded-3 {
     padding-top: 5rem !important;
     padding-bottom: 5rem !important;
+    border-radius: 1.5rem !important; /* Lebih membulat */
 }
 
 /* Table styles */
 .table-bordered th, .table-bordered td {
-    border-color: rgba(0, 0, 0, 0.05); /* Border tabel lebih halus */
+    border-color: rgba(0, 0, 0, 0.08); /* Border tabel lebih terlihat tapi halus */
+}
+.table-hover tbody tr {
+    transition: background-color 0.2s ease;
 }
 .table-hover tbody tr:hover {
-    background-color: rgba(var(--bs-primary-rgb), 0.05); /* Sedikit warna saat hover */
+    background-color: var(--bs-light-hover); /* Warna terang saat hover */
+}
+
+/* Alert/Flash Messages */
+.alert {
+    border-radius: 0.75rem;
+    padding: 1rem 1.5rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
 }
