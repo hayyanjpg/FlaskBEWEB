@@ -2,9 +2,10 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from database import db, User, MahasiswaProfile, Application
 from werkzeug.utils import secure_filename
-import os # <--- PASTIKAN BARIS INI ADA
+import os
 import datetime
 from functools import wraps
+import re # Diperlukan untuk validasi password
 
 # Inisialisasi Flask App
 app = Flask(__name__,
@@ -12,20 +13,19 @@ app = Flask(__name__,
             static_folder='static')
 
 # --- Konfigurasi Aplikasi Flask ---
-app.config['SECRET_KEY'] = 'your_very_strong_secret_key_here_ganti_ini_dengan_kuat'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///kominfo_magang.db'
+app.config['SECRET_KEY'] = 'your_very_strong_secret_key_here_ganti_ini_dengan_kuat' # GANTI DENGAN KUNCI ACAK YANG KUAT!
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///kominfo_magang.db' # Konfigurasi database SQLite
 
-# === PERUBAHAN UTAMA DI SINI ===
-# Sebelumnya: app.config['UPLOAD_FOLDER'] = 'backend/static/uploads'
+# Menggunakan os.path.join dan app.root_path untuk path UPLOAD_FOLDER yang lebih robust
 app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'static', 'uploads')
-# ==============================
 
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # Batas ukuran file: 16 MB
 
 # Pastikan folder upload ada, jika tidak, buatlah
 if not os.path.exists(app.config['UPLOAD_FOLDER']):
     os.makedirs(app.config['UPLOAD_FOLDER'])
 
+# Inisialisasi database dengan aplikasi Flask
 db.init_app(app)
 
 # --- Decorator Helper untuk Otentikasi dan Otorisasi ---
@@ -68,6 +68,23 @@ def register():
         if password != confirm_password:
             flash('Konfirmasi kata sandi tidak cocok!', 'danger')
             return redirect(url_for('register'))
+
+        # === VALIDASI PASSWORD BARU ===
+        # Minimal 10 karakter
+        if len(password) < 10:
+            flash('Kata sandi minimal harus 10 karakter.', 'danger')
+            return redirect(url_for('register'))
+        
+        # Minimal 1 karakter khusus (misal: @, #, $, %, ^, &, *, !, ~, ?, .)
+        if not re.search(r'[!@#$%^&*()_+{}\[\]:;"\'<>,.?/~`]', password):
+            flash('Kata sandi harus mengandung setidaknya satu karakter khusus (contoh: @, #, $).', 'danger')
+            return redirect(url_for('register'))
+        
+        # Minimal 1 angka
+        if not re.search(r'\d', password):
+            flash('Kata sandi harus mengandung setidaknya satu angka.', 'danger')
+            return redirect(url_for('register'))
+        # ==============================
 
         existing_user_by_username = User.query.filter_by(username=username).first()
         if existing_user_by_username:
@@ -117,8 +134,6 @@ def logout():
     session.pop('role', None)
     flash('Anda telah logout.', 'info')
     return redirect(url_for('index'))
-
-# --- ROUTES UNTUK MAHASISWA (ROLE: 'mahasiswa') ---
 
 @app.route('/dashboard/mahasiswa')
 @login_required(role='mahasiswa')
@@ -224,8 +239,6 @@ def apply_magang(user):
         return redirect(url_for('user_dashboard'))
     return render_template('apply_form.html', user=user)
 
-# --- ROUTES UNTUK ADMIN (ROLE: 'admin') ---
-
 @app.route('/dashboard/admin')
 @login_required(role='admin')
 def admin_dashboard(user):
@@ -270,7 +283,6 @@ def application_detail(user, app_id):
                            applicant_user=applicant_user,
                            applicant_profile=applicant_profile)
 
-# --- Perintah CLI Flask untuk Inisialisasi Database ---
 @app.cli.command('init-db')
 def init_db_command():
     """Menghapus data yang ada dan membuat tabel baru.
@@ -286,7 +298,6 @@ def init_db_command():
         print('Database berhasil diinisialisasi dan user admin default dibuat (username: admin_kominfo, password: adminpass123).')
         print('*** PENTING: Segera ganti password admin setelah login pertama kali! ***')
 
-# --- Menjalankan Aplikasi Flask ---
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()

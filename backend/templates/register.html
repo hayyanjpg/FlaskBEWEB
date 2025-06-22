@@ -8,7 +8,7 @@
         <div class="card shadow-sm p-4">
             <div class="card-body">
                 <h2 class="card-title text-center mb-4 fw-bold">Daftar Akun Baru</h2>
-                <form action="{{ url_for('register') }}" method="POST">
+                <form action="{{ url_for('register') }}" method="POST" id="registerForm"> {# Tambahkan ID form #}
                     <div class="mb-3">
                         <label for="username" class="form-label">Username:</label>
                         <input type="text" id="username" name="username" class="form-control" required>
@@ -19,11 +19,17 @@
                     </div>
                     <div class="mb-3">
                         <label for="password" class="form-label">Kata Sandi:</label>
-                        <input type="password" id="password" name="password" class="form-control" required>
+                        <input type="password" id="password" name="password" class="form-control" required minlength="10"> {# Tambahkan minlength #}
+                        {# Tambahkan elemen untuk feedback validasi #}
+                        <div id="passwordHelp" class="form-text">
+                            Kata sandi minimal 10 karakter, harus mengandung angka dan karakter khusus.
+                        </div>
+                        <div id="passwordError" class="invalid-feedback"></div>
                     </div>
                     <div class="mb-4">
                         <label for="confirm_password" class="form-label">Konfirmasi Kata Sandi:</label>
-                        <input type="password" id="confirm_password" name="confirm_password" class="form-control" required>
+                        <input type="password" id="confirm_password" name="confirm_password" class="form-control" required minlength="10">
+                        <div id="confirmPasswordError" class="invalid-feedback"></div>
                     </div>
                     <div class="d-grid gap-2">
                         <button type="submit" class="btn btn-primary btn-lg">Daftar</button>
@@ -34,4 +40,8 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/main.js') }}"></script> {# Pastikan ini di load di sini #}
 {% endblock %}
