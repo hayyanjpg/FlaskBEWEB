@@ -3,105 +3,125 @@
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Main JavaScript untuk aplikasi Kominfo Magang telah dimuat!');
 
+    // --- Fungsi Toggle Password Visibility (lebih umum) ---
+    function setupPasswordToggle(passwordFieldId, toggleButtonId) {
+        const passwordField = document.getElementById(passwordFieldId);
+        const toggleButton = document.getElementById(toggleButtonId);
+
+        if (passwordField && toggleButton) {
+            console.log(`Setting up toggle for field: ${passwordFieldId} with button: ${toggleButtonId}`); // Debugging
+            toggleButton.addEventListener('click', function () {
+                console.log(`Toggle button clicked for: ${passwordFieldId}`); // Debugging
+                const type = passwordField.getAttribute('type');
+                if (type === 'password') {
+                    passwordField.setAttribute('type', 'text');
+                    this.querySelector('i').classList.remove('bi-eye');
+                    this.querySelector('i').classList.add('bi-eye-slash');
+                } else {
+                    passwordField.setAttribute('type', 'password');
+                    this.querySelector('i').classList.remove('bi-eye-slash');
+                    this.querySelector('i').classList.add('bi-eye');
+                }
+            });
+        } else {
+            console.warn(`Elements not found for password toggle: Field ID '${passwordFieldId}', Button ID '${toggleButtonId}'`); // Debugging
+        }
+    }
+
+    // Panggil fungsi toggle untuk field password di halaman register
+    // ID di register: password (input), togglePassword (button)
+    //         confirm_password (input), toggleConfirmPassword (button)
+    setupPasswordToggle('password', 'togglePassword'); // Register Password
+    setupPasswordToggle('confirm_password', 'toggleConfirmPassword'); // Register Confirm Password
+
+    // Panggil fungsi toggle untuk field password di halaman login
+    // ID di login: loginPassword (input), toggleLoginPassword (button)
+    setupPasswordToggle('loginPassword', 'toggleLoginPassword'); // <--- UBAH DI SINI
+
+
+    // --- Validasi Register Form (hanya jika elemen register form ada di halaman) ---
     const registerForm = document.getElementById('registerForm');
-    const passwordInput = document.getElementById('password');
-    const confirmPasswordInput = document.getElementById('confirm_password');
-    const passwordErrorDiv = document.getElementById('passwordError');
-    const confirmPasswordErrorDiv = document.getElementById('confirmPasswordError');
-
-    // Fungsi validasi password
-    function validatePassword() {
-        const password = passwordInput.value;
-        const messages = [];
-
-        // Minimal 10 karakter
-        if (password.length < 10) {
-            messages.push('Kata sandi minimal 10 karakter.');
-        }
-
-        // Minimal 1 karakter khusus (contoh: @, #, $, %)
-        const specialCharRegex = /[!@#$%^&*()_+{}\[\]:;"'<>,.?/~`]/;
-        if (!specialCharRegex.test(password)) {
-            messages.push('Harus mengandung setidaknya satu karakter khusus (contoh: @, #, $).');
-        }
-
-        // Minimal 1 angka
-        const numberRegex = /\d/;
-        if (!numberRegex.test(password)) {
-            messages.push('Harus mengandung setidaknya satu angka.');
-        }
-        
-        // Opsional: Minimal 1 huruf besar dan 1 huruf kecil
-        // const upperCaseRegex = /[A-Z]/;
-        // if (!upperCaseRegex.test(password)) {
-        //     messages.push('Harus mengandung setidaknya satu huruf kapital.');
-        // }
-        // const lowerCaseRegex = /[a-z]/;
-        // if (!lowerCaseRegex.test(password)) {
-        //     messages.push('Harus mengandung setidaknya satu huruf kecil.');
-        // }
-
-        if (messages.length > 0) {
-            passwordInput.classList.add('is-invalid');
-            passwordInput.classList.remove('is-valid');
-            passwordErrorDiv.innerHTML = messages.join('<br>');
-            return false;
-        } else {
-            passwordInput.classList.remove('is-invalid');
-            passwordInput.classList.add('is-valid');
-            passwordErrorDiv.innerHTML = '';
-            return true;
-        }
-    }
-
-    // Fungsi validasi konfirmasi password
-    function validateConfirmPassword() {
-        const password = passwordInput.value;
-        const confirmPassword = confirmPasswordInput.value;
-
-        if (password !== confirmPassword) {
-            confirmPasswordInput.classList.add('is-invalid');
-            confirmPasswordInput.classList.remove('is-valid');
-            confirmPasswordErrorDiv.textContent = 'Konfirmasi kata sandi tidak cocok!';
-            return false;
-        } else {
-            confirmPasswordInput.classList.remove('is-invalid');
-            confirmPasswordInput.classList.add('is-valid');
-            confirmPasswordErrorDiv.textContent = '';
-            return true;
-        }
-    }
-
-    // Event listeners untuk validasi real-time
-    if (passwordInput && confirmPasswordInput) {
-        passwordInput.addEventListener('input', function() {
-            validatePassword();
-            validateConfirmPassword(); // Validasi konfirmasi juga saat password berubah
-        });
-
-        confirmPasswordInput.addEventListener('input', validateConfirmPassword);
-    }
-
-    // Event listener saat form disubmit
     if (registerForm) {
+        // Karena ID password di register dan login berbeda, kita bisa langsung merujuk ke elemen register
+        const passwordInputRegister = document.getElementById('password');
+        const confirmPasswordInputRegister = document.getElementById('confirm_password');
+        const passwordErrorDiv = document.getElementById('passwordError');
+        const confirmPasswordErrorDiv = document.getElementById('confirmPasswordError');
+
+        function validatePasswordRegister() {
+            const password = passwordInputRegister.value;
+            const messages = [];
+
+            if (password.length < 10) {
+                messages.push('Kata sandi minimal 10 karakter.');
+            }
+
+            const specialCharRegex = /[!@#$%^&*()_+{}\[\]:;"'<>,.?/~`]/;
+            if (!specialCharRegex.test(password)) {
+                messages.push('Harus mengandung setidaknya satu karakter khusus (contoh: @, #, $).');
+            }
+
+            const numberRegex = /\d/;
+            if (!numberRegex.test(password)) {
+                messages.push('Harus mengandung setidaknya satu angka.');
+            }
+            
+            if (messages.length > 0) {
+                passwordInputRegister.classList.add('is-invalid');
+                passwordInputRegister.classList.remove('is-valid');
+                passwordErrorDiv.innerHTML = messages.join('<br>');
+                return false;
+            } else {
+                passwordInputRegister.classList.remove('is-invalid');
+                passwordInputRegister.classList.add('is-valid');
+                passwordErrorDiv.innerHTML = '';
+                return true;
+            }
+        }
+
+        function validateConfirmPasswordRegister() {
+            const password = passwordInputRegister.value;
+            const confirmPassword = confirmPasswordInputRegister.value;
+
+            if (password !== confirmPassword) {
+                confirmPasswordInputRegister.classList.add('is-invalid');
+                confirmPasswordInputRegister.classList.remove('is-valid');
+                confirmPasswordErrorDiv.textContent = 'Konfirmasi kata sandi tidak cocok!';
+                return false;
+            } else {
+                confirmPasswordInputRegister.classList.remove('is-invalid');
+                confirmPasswordInputRegister.classList.add('is-valid');
+                confirmPasswordErrorDiv.textContent = '';
+                return true;
+            }
+        }
+
+        if (passwordInputRegister && confirmPasswordInputRegister) {
+            passwordInputRegister.addEventListener('input', function() {
+                validatePasswordRegister();
+                validateConfirmPasswordRegister();
+            });
+
+            confirmPasswordInputRegister.addEventListener('input', validateConfirmPasswordRegister);
+        }
+
         registerForm.addEventListener('submit', function(event) {
-            const isPasswordValid = validatePassword();
-            const isConfirmPasswordValid = validateConfirmPassword();
+            const isPasswordValid = validatePasswordRegister();
+            const isConfirmPasswordValid = validateConfirmPasswordRegister();
 
             if (!isPasswordValid || !isConfirmPasswordValid) {
-                event.preventDefault(); // Mencegah form dikirim jika ada error
+                event.preventDefault();
             }
-            // Jika semua validasi JS lolos, form akan dikirim ke backend
         });
     }
+
 
     // Untuk menyembunyikan flash message setelah beberapa detik
     const flashMessages = document.querySelectorAll('.alert');
     flashMessages.forEach(message => {
         setTimeout(() => {
-            // Gunakan Bootstrap's built-in alert close
             const bsAlert = new bootstrap.Alert(message);
             bsAlert.close();
-        }, 5000); // Pesan akan hilang setelah 5 detik
+        }, 5000);
     });
 });

@@ -14,8 +14,13 @@
                         <input type="text" id="username" name="username" class="form-control" required>
                     </div>
                     <div class="mb-4">
-                        <label for="password" class="form-label">Password:</label>
-                        <input type="password" id="password" name="password" class="form-control" required>
+                        <label for="loginPassword" class="form-label">Password:</label> {# UBAH ID DI SINI #}
+                        <div class="input-group">
+                            <input type="password" id="loginPassword" name="password" class="form-control" required> {# UBAH ID DI SINI #}
+                            <button class="btn btn-outline-secondary" type="button" id="toggleLoginPassword">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                        </div>
                     </div>
                     <div class="d-grid gap-2 mb-3">
                         <button type="submit" class="btn btn-primary btn-lg">Login</button>
